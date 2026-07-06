@@ -1,4 +1,9 @@
+# Terraform
 .terraform/
-terraform.tfstate
-terraform.tfstate.backup
-*.tfvars
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# Sistema
+.DS_Store
+Thumbs.db
