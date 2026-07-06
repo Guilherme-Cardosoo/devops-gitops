@@ -20,9 +20,9 @@ spec:
     spec:
       containers:
         - name: backend
-          image: devops-backend-backend:latest
+          image: guiihermecardoso/devops-backend:latest
 
-          imagePullPolicy: Never
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 8000

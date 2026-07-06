@@ -1,0 +1,40 @@
+---
+- name: Instalar K3s no control-plane
+  hosts: control
+  become: true
+
+  tasks:
+    - name: Instalar K3s Server
+      shell: |
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -
+
+- name: Obter token do cluster
+  hosts: control
+  become: true
+
+  tasks:
+    - name: Ler token
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: token_file
+
+    - name: Salvar token
+      set_fact:
+        cluster_token: "{{ token_file.content | b64decode | trim }}"
+
+- name: Instalar K3s nos workers
+  hosts: workers
+  become: true
+
+  vars:
+    server_ip: "{{ groups['control'][0] }}"
+    token: "{{ hostvars[groups['control'][0]].cluster_token }}"
+
+  tasks:
+    - name: Instalar K3s Agent
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        K3S_URL=https://{{ server_ip }}:6443 \
+        K3S_TOKEN={{ token }} \
+        INSTALL_K3S_VERSION={{ k3s_version }} \
+        sh -
